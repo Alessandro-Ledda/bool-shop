@@ -41,12 +41,12 @@ function index(req, res) {
 
 // show
 function show(req, res) {
-  const { id } = req.params;
+  const { slug } = req.params;
 
-  const productSql = "SELECT * FROM products WHERE id = ?";
+  const productSql = "SELECT * FROM products WHERE slug = ?";
 
   // chiamata a DB principale per recuperare il prodotto
-  connection.query(productSql, [id], (err, productResults) => {
+  connection.query(productSql, [slug], (err, productResults) => {
     if (err) return res.status(500).json({ error: "Database query failed" });
     if (productResults.length === 0)
       return res.status(404).json({ error: "Product not found" });

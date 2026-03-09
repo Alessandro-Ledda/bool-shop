@@ -11,6 +11,6 @@ const { index, show } = productsController;
 router.get("/", index);
 
 //rotta di show
-router.get("/:id", show);
+router.get("/:slug", show);
 
 module.exports = router;
