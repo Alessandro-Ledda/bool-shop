@@ -32,6 +32,7 @@ function index(req, res) {
         return {
           ...product,
           image_url: `${process.env.APP_URL}/${product.image}`,
+          image_details_url: `${process.env.APP_URL}/${product.image_details}`,
         };
       }),
     );
@@ -53,8 +54,9 @@ function show(req, res) {
     // salviamo il risultato in una cost
     const product = productResults[0];
 
-    // aggiunta url all'immagine
+    // aggiunta url alle immagini
     product.image_url = `${process.env.APP_URL}/${product.image}`;
+    product.image_details_url = `${process.env.APP_URL}/${product.image_details}`;
 
     res.json(product);
   });
