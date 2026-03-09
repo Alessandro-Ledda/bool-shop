@@ -6,6 +6,6 @@ const couponsController = require("./../controllers/couponsController");
 //-------------------------------------DEFINIZIONE ROTTE----------------------
 
 //rotta index
-couponsRouter.get("/", couponsController.index);
+couponsRouter.get("/", couponsController.verify);
 
 module.exports = couponsRouter;
