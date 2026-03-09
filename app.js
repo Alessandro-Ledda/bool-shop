@@ -7,6 +7,7 @@ const cors = require("cors");
 
 // import del router dei prodotti
 const productsRouter = require("./routers/productsRouter.js");
+const couponsRouter = require("./routers/couponsRouter.js");
 
 // import del middelware di gestione errore interno 500
 const errorsHandler = require("./middlewares/errorsHandler.js");
@@ -34,6 +35,7 @@ app.get("/api", (req, res) => {
 
 // rotte relative al router dei prodotti
 app.use("/api/products", productsRouter);
+app.use("/api/coupons", couponsRouter);
 
 // registriamo middelware di gestione rotta inesistente
 app.use(notFound);
