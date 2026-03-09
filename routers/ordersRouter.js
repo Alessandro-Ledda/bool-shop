@@ -8,4 +8,6 @@ const ordersController = require("./../controllers/ordersController");
 //rotta index
 ordersRouter.get("/", ordersController.index);
 
+ordersRouter.post("/", ordersController.update);
+
 module.exports = ordersRouter;
