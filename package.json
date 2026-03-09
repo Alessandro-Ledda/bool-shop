@@ -1,0 +1,12 @@
+{
+  "name": "boolshop",
+  "version": "1.0.0",
+  "description": "project-work",
+  "license": "ISC",
+  "author": "ale-save-marck-andre",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
