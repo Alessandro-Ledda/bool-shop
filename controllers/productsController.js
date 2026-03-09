@@ -1,7 +1,9 @@
 //importo connsessione DB
 const connection = require("./../data/db");
 
-//definisco funzioni CRUD
+//-------definisco funzioni CRUD--------
+
+// index
 function index(req, res) {
   //recuper valore chiave order per vedere ordinamento
   const order = req.query.order;
@@ -36,4 +38,26 @@ function index(req, res) {
   });
 }
 
-module.exports = { index };
+// show
+function show(req, res) {
+  const { id } = req.params;
+
+  const productSql = "SELECT * FROM products WHERE id = ?";
+
+  // chiamata a DB principale per recuperare il prodotto
+  connection.query(productSql, [id], (err, productResults) => {
+    if (err) return res.status(500).json({ error: "Database query failed" });
+    if (productResults.length === 0)
+      return res.status(404).json({ error: "Product not found" });
+
+    // salviamo il risultato in una cost
+    const product = productResults[0];
+
+    // aggiunta url all'immagine
+    product.image_url = `${process.env.APP_URL}/${product.image}`;
+
+    res.json(product);
+  });
+}
+
+module.exports = { index, show };
