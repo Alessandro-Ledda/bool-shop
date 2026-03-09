@@ -2,13 +2,10 @@ const express = require("express");
 const productsRouter = express.Router();
 
 //------------------------------------IMPORTO CONTROLLER----------------------
-
+const productsController = require("./../controllers/productsController");
 //-------------------------------------DEFINIZIONE ROTTE----------------------
 
 //rotta index
-productsRouter.get("/", (req, res) => res.send("<h1>index</h1>"));
-
-//rotta index relativa a una specifica categoria
-productsRouter.get("/category/:idCategory", productsController.indexCategory);
+productsRouter.get("/", productsController.index);
 
 module.exports = productsRouter;
