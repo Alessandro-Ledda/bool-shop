@@ -1,11 +1,16 @@
 const express = require("express");
-const productsRouter = express.Router();
+const router = express.Router();
 
-//------------------------------------IMPORTO CONTROLLER----------------------
+//-----------------Import e destrutturazione di productsController----------
 const productsController = require("./../controllers/productsController");
-//-------------------------------------DEFINIZIONE ROTTE----------------------
+const { index, show } = productsController;
 
-//rotta index
-productsRouter.get("/", productsController.index);
+//--------------------DEFINIZIONE ROTTE---------------------
 
-module.exports = productsRouter;
+//rotta di index
+router.get("/", index);
+
+//rotta di show
+router.get("/:id", show);
+
+module.exports = router;
