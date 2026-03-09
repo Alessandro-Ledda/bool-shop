@@ -2,7 +2,7 @@
 const connection = require("./../data/db");
 
 //definisco funzioni CRUD
-function index(req, res) {
+function verify(req, res) {
   //recupero valore coupons che ci arriva nell'endpoint
   const coupon_code = req.query.coupon;
 
@@ -36,10 +36,10 @@ function index(req, res) {
       });
     } else {
       res.json({
-        message: `coupon scaduto il ${obj_coupon.end_date}`,
+        message: `coupon scaduto in data ${obj_coupon.end_date.toLocaleDateString()}`,
       });
     }
   });
 }
 
-module.exports = { index };
+module.exports = { verify };
