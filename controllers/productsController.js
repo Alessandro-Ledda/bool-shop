@@ -2,7 +2,6 @@
 const connection = require("./../data/db");
 
 //definisco funzioni CRUD
-//definisco funzioni CRUD
 function index(req, res) {
   //recuper valore chiave order per vedere ordinamento
   const order = req.query.order;
@@ -26,9 +25,14 @@ function index(req, res) {
   connection.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: "database not found" });
 
-    //se non ci sono errori torno risultato query DB
-    const resObj = { n_products: results.length, products: results };
-    res.json(resObj);
+    res.json(
+      results.map((product) => {
+        return {
+          ...product,
+          image_url: `${process.env.APP_URL}/${product.image}`,
+        };
+      }),
+    );
   });
 }
 
