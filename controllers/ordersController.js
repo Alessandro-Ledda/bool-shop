@@ -139,11 +139,12 @@ function update(req, res) {
       const total_sum = results[0].total_sum;
 
       //creo variabile totale da andare a caricare come ordine totale, inizializzo come totale somma dei prodotti ricavata dal DB
-      let total = total_sum;
+      let total_order = parseInt(total_sum);
 
       //se esiste il valore coupon percentage, e quindi precedentemente è stato inserito un coupon valido allora definisco il totate scontato
       coupon.coupon_percentage &&
-        (total = total_sum - total_sum * (coupon.coupon_percentage / 100));
+        (total_order =
+          total_sum - total_sum * (coupon.coupon_percentage / 100));
 
       //eseguo query finale per andare a caricare i dati nell'ordine
       connection.query(
@@ -157,7 +158,7 @@ function update(req, res) {
           customer_phone,
           customer_address,
           coupon.coupon_percentage,
-          total,
+          total_order,
         ],
         (err, results) => {
           if (err) return res.status(500).json({ error: err });
@@ -166,7 +167,7 @@ function update(req, res) {
             coupon_valid: coupon.valid,
             message_coupon: coupon.message,
             discount_coupon: coupon.coupon_percentage,
-            total_order: Number(total.toFixed(2)),
+            total_order: Number(total_order.toFixed(2)),
           });
         },
       );
