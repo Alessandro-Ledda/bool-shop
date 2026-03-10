@@ -6,17 +6,35 @@ const connection = require("./../data/db");
 
 //definisco funzioni CRUD
 
-//INDEX per recuperare lista ordini
-function index(req, res) {
-  //definisco query sql
+// //INDEX per recuperare lista ordini
+// function index(req, res) {
+//   //definisco query sql
+//   const sql = `SELECT *
+//                  FROM orders`;
+
+//   //eseguo richiesta al DB
+//   connection.query(sql, (err, results) => {
+//     if (err) return res.status(500).json({ error: "database not found" });
+
+//     res.json(results);
+//   });
+// }
+
+// show order 1
+function show(req, res) {
   const sql = `SELECT *
-                 FROM orders`;
+                 FROM orders WHERE id = 1`;
 
-  //eseguo richiesta al DB
+  // chiamata a DB principale per recuperare il prodotto
   connection.query(sql, (err, results) => {
-    if (err) return res.status(500).json({ error: "database not found" });
+    if (err) return res.status(500).json({ error: "Database query failed" });
+    if (results.length === 0)
+      return res.status(404).json({ error: "Order not found" });
 
-    res.json(results);
+    // salviamo il risultato in una cost
+    const order = results[0];
+
+    res.json(order);
   });
 }
 
@@ -147,6 +165,7 @@ function update(req, res) {
           res.json({
             coupon_valid: coupon.valid,
             message_coupon: coupon.message,
+            discount_coupon: coupon.coupon_percentage,
             total_order: Number(total.toFixed(2)),
           });
         },
@@ -155,4 +174,4 @@ function update(req, res) {
   });
 }
 
-module.exports = { index, update };
+module.exports = { show, update };
