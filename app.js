@@ -7,7 +7,6 @@ const cors = require("cors");
 
 // import del router dei prodotti
 const productsRouter = require("./routers/productsRouter.js");
-const couponsRouter = require("./routers/couponsRouter.js");
 const ordersRouter = require("./routers/ordersRouter.js");
 const order_productRouter = require("./routers/order_productRouter.js");
 
@@ -37,7 +36,6 @@ app.get("/api", (req, res) => {
 
 // rotte relative al router dei prodotti
 app.use("/api/products", productsRouter);
-app.use("/api/coupons", couponsRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/order_product", order_productRouter);
 
