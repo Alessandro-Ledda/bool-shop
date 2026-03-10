@@ -1,9 +1,6 @@
 //importo connsessione DB
 const connection = require("./../data/db");
 
-// //importo middlewere per verifica coupon
-// const verifyCoupon = require("./../middlewares/verifyCoupon");
-
 //definisco funzioni CRUD
 
 // //INDEX per recuperare lista ordini

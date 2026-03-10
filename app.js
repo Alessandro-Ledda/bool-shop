@@ -9,6 +9,7 @@ const cors = require("cors");
 const productsRouter = require("./routers/productsRouter.js");
 const couponsRouter = require("./routers/couponsRouter.js");
 const ordersRouter = require("./routers/ordersRouter.js");
+const order_productRouter = require("./routers/order_productRouter.js");
 
 // import del middelware di gestione errore interno 500
 const errorsHandler = require("./middlewares/errorsHandler.js");
@@ -38,6 +39,7 @@ app.get("/api", (req, res) => {
 app.use("/api/products", productsRouter);
 app.use("/api/coupons", couponsRouter);
 app.use("/api/orders", ordersRouter);
+app.use("/api/order_product", order_productRouter);
 
 // registriamo middelware di gestione rotta inesistente
 app.use(notFound);
@@ -46,5 +48,5 @@ app.use(notFound);
 app.use(errorsHandler);
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`App listening on port ${port}`);
 });
