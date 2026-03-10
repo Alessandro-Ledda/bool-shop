@@ -19,19 +19,34 @@ const connection = require("./../data/db");
 
 // show order 1
 function show(req, res) {
-  const sql = `SELECT *
+  const sqlCheckForm = `SELECT *
                  FROM orders WHERE id = 1`;
 
-  // chiamata a DB principale per recuperare il prodotto
-  connection.query(sql, (err, results) => {
+  const sqlCheckProducts = `SELECT product_id,name,price,discount_percentage,unit_price,unit_quantity,image,order_id
+                            FROM order_product
+                            JOIN products ON order_product.product_id = products.id
+                            WHERE order_id = 1`;
+
+  // chiamata a DB per recuperare dati utente, sconto coupon e costo totale carrello scontato
+  connection.query(sqlCheckForm, (err, results) => {
     if (err) return res.status(500).json({ error: "Database query failed" });
     if (results.length === 0)
       return res.status(404).json({ error: "Order not found" });
 
     // salviamo il risultato in una cost
-    const order = results[0];
+    const checkForm = results[0];
 
-    res.json(order);
+    //faccio chiamata per recuperare lista prodotti nell'ordine
+    connection.query(sqlCheckProducts, (err, results) => {
+      if (err) return res.status(500).json({ error: "Database query failed" });
+      if (results.length === 0)
+        return res.status(404).json({ error: "Order not found" });
+
+      // salviamo il risultato in una cost
+      const checkProducts = results;
+
+      res.json({ products: checkProducts, order: checkForm });
+    });
   });
 }
 
