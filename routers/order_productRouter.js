@@ -8,4 +8,7 @@ const order_productController = require("./../controllers/order_productControlle
 //rotta index
 order_productRouter.get("/order1", order_productController.index);
 
+//rotta destroy
+order_productRouter.delete("/order1/:id", order_productController.destroy);
+
 module.exports = order_productRouter;
