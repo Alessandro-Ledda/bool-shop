@@ -12,14 +12,11 @@ order_productRouter.get("/order", order_productController.index);
 order_productRouter.post("/order", order_productController.store);
 
 //rotta modify
-order_productRouter.patch(
-  "/order1/:product_id",
-  order_productController.modify,
-);
+order_productRouter.patch("/order/:product_id", order_productController.modify);
 
 //rotta destroy
 order_productRouter.delete(
-  "/order1/:product_id",
+  "/order/:product_id",
   order_productController.destroy,
 );
 
