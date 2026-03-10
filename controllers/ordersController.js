@@ -42,8 +42,13 @@ function show(req, res) {
       if (results.length === 0)
         return res.status(404).json({ error: "Order not found" });
 
-      // salviamo il risultato in una cost
-      const checkProducts = results;
+      // salviamo il risultato in una cost e aggiungiamo image_url
+      const checkProducts = results.map((product) => {
+        return {
+          ...product,
+          image_url: `${process.env.APP_URL}/${product.image}`,
+        };
+      });
 
       res.json({ products: checkProducts, order: checkForm });
     });
