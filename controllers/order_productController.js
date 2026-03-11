@@ -29,41 +29,47 @@ function index(req, res) {
 //STORE per inserire un nuovo prodotto nell'ordine
 function store(req, res) {
   //prendo i dati in ingresso
-  const { product_id, unit_quantity } = req.body;
-
-  //-----------------RECUPERO DA DB PREZZO E SCONTO DEL PRODOTTO------------------------
-  const sqlProduct = `SELECT price, discount_percentage
+  const { products } = req.body;
+  products.forEach((product, index) => {
+    //-----------------RECUPERO DA DB PREZZO E SCONTO DEL PRODOTTO------------------------
+    const sqlProduct = `SELECT price, discount_percentage
                       FROM products
                       WHERE id = ?`;
 
-  //eseguo query al DB
-  connection.query(sqlProduct, [product_id], (err, results) => {
-    //definisco product price come intero per utlizzarlo nelle operazioni di verifica
-    const product_price = parseInt(results[0].price);
-    const discount_percentage = parseInt(results[0].discount_percentage);
+    //eseguo query al DB
+    connection.query(sqlProduct, [product.product_id], (err, results) => {
+      //definisco product price come intero per utlizzarlo nelle operazioni di verifica
+      const product_price = parseInt(results[0].price);
+      const discount_percentage = parseInt(results[0].discount_percentage);
 
-    //definisco il prezzo finale per il singolo prodotto
-    let unit_price = product_price;
+      //definisco il prezzo finale per il singolo prodotto
+      let unit_price = product_price;
 
-    //se esiste il valore discount percentage, e quindi il prodotto è in promozione allora definisco il totate scontato
-    discount_percentage &&
-      (unit_price =
-        product_price - product_price * (discount_percentage / 100));
+      //se esiste il valore discount percentage, e quindi il prodotto è in promozione allora definisco il totate scontato
+      discount_percentage &&
+        (unit_price =
+          product_price - product_price * (discount_percentage / 100));
 
-    //definisco sql per andare a crearmi la nuova riga nell'ordine 1 con il nuovo prodotto
-    const sql = `INSERT INTO order_product (product_id, order_id, unit_quantity, unit_price)
+      //definisco sql per andare a crearmi la nuova riga nell'ordine 1 con il nuovo prodotto
+      const sql = `INSERT INTO order_product (product_id, order_id, unit_quantity, unit_price)
                 VALUES (?, 1, ?, ?)`;
 
-    //eseguo richiesta al DB
-    connection.query(
-      sql,
-      [product_id, unit_quantity, unit_price],
-      (err, results) => {
-        if (err) return res.status(500).json({ error: "database not found" });
+      //eseguo richiesta al DB
+      connection.query(
+        sql,
+        [product.product_id, product.unit_quantity, unit_price],
+        (err, results) => {
+          if (err) return res.status(500).json({ error: "database not found" });
 
-        res.sendStatus(201);
-      },
-    );
+          console.log(index);
+          console.log(products.length - 2);
+
+          if (index === products.length - 1) {
+            res.sendStatus(201);
+          }
+        },
+      );
+    });
   });
 }
 
