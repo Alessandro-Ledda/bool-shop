@@ -6,10 +6,10 @@ const order_productController = require("./../controllers/order_productControlle
 //-------------------------------------DEFINIZIONE ROTTE----------------------
 
 //rotta index
-order_productRouter.get("/order", order_productController.index);
+order_productRouter.get("/order/:orderid", order_productController.index);
 
 //rotta store
-order_productRouter.post("/order", order_productController.store);
+order_productRouter.post("/order/:order_id", order_productController.store);
 
 //rotta modify
 order_productRouter.patch("/order/:product_id", order_productController.modify);
