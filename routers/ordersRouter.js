@@ -6,8 +6,8 @@ const ordersController = require("./../controllers/ordersController");
 //-------------------------------------DEFINIZIONE ROTTE----------------------
 
 //rotta index
-ordersRouter.get("/order", ordersController.show);
+ordersRouter.get("/:order_id", ordersController.show);
 
-ordersRouter.post("/order", ordersController.store);
+ordersRouter.post("/", ordersController.store);
 
 module.exports = ordersRouter;
