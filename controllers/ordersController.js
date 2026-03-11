@@ -3,32 +3,20 @@ const connection = require("./../data/db");
 
 //definisco funzioni CRUD
 
-// //INDEX per recuperare lista ordini
-// function index(req, res) {
-//   //definisco query sql
-//   const sql = `SELECT *
-//                  FROM orders`;
-
-//   //eseguo richiesta al DB
-//   connection.query(sql, (err, results) => {
-//     if (err) return res.status(500).json({ error: "database not found" });
-
-//     res.json(results);
-//   });
-// }
-
 // show order 1
 function show(req, res) {
+  //recupero parametro id dell'ordine da req
+  const order_id = req.params.order_id;
   const sqlCheckForm = `SELECT *
-                 FROM orders WHERE id = 1`;
+                 FROM orders WHERE id = ?`;
 
   const sqlCheckProducts = `SELECT product_id,name,price,discount_percentage,unit_price,unit_quantity,image,order_id
                             FROM order_product
                             JOIN products ON order_product.product_id = products.id
-                            WHERE order_id = 1`;
+                            WHERE order_id = ?`;
 
   // chiamata a DB per recuperare dati utente, sconto coupon e costo totale carrello scontato
-  connection.query(sqlCheckForm, (err, results) => {
+  connection.query(sqlCheckForm, [order_id], (err, results) => {
     if (err) return res.status(500).json({ error: "Database query failed" });
     if (results.length === 0)
       return res.status(404).json({ error: "Order not found" });
@@ -37,7 +25,7 @@ function show(req, res) {
     const checkForm = results[0];
 
     //faccio chiamata per recuperare lista prodotti nell'ordine
-    connection.query(sqlCheckProducts, (err, results) => {
+    connection.query(sqlCheckProducts, [order_id], (err, results) => {
       if (err) return res.status(500).json({ error: "Database query failed" });
       if (results.length === 0)
         return res.status(404).json({ error: "Order not found" });
@@ -56,7 +44,7 @@ function show(req, res) {
 }
 
 //update per andare a caricare nell'ordine 1 i dati ricevuti dal from del frontend
-function update(req, res) {
+function store(req, res) {
   //recupero body da req
   const {
     customer_first_name,
@@ -72,19 +60,8 @@ function update(req, res) {
   //definisco query da fare al db
 
   //QUERY FINALE PER CARICARE I DATI
-  const sqlUpdateOreders = `UPDATE orders
-              SET 
-              customer_first_name = ?,
-               customer_last_name = ?, 
-               customer_city = ?, 
-               customer_cap = ?, 
-               customer_email = ?, 
-               customer_phone = ?,
-               customer_address = ?, 
-               order_date = NOW(), 
-               coupon_percentage = ?, 
-               total = ?
-              WHERE id = 1`;
+  const sqlStoreOreders = `INSERT INTO orders(customer_first_name, customer_last_name, customer_city, customer_cap, customer_email, customer_phone, customer_address, order_date, coupon_percentage, total)
+VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
 
   //------------------LOGICA PER VERIFICARE COUPON---------------------------
 
@@ -165,7 +142,7 @@ function update(req, res) {
 
       //eseguo query finale per andare a caricare i dati nell'ordine
       connection.query(
-        sqlUpdateOreders,
+        sqlStoreOreders,
         [
           customer_first_name,
           customer_last_name,
@@ -181,6 +158,8 @@ function update(req, res) {
           if (err) return res.status(500).json({ error: err });
 
           res.json({
+            nuovoId: results.insertId,
+
             coupon_valid: coupon.valid,
             message_coupon: coupon.message,
             discount_coupon: coupon.coupon_percentage,
@@ -193,4 +172,4 @@ function update(req, res) {
   });
 }
 
-module.exports = { show, update };
+module.exports = { show, store };
