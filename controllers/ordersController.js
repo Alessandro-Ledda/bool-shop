@@ -3,20 +3,6 @@ const connection = require("./../data/db");
 
 //definisco funzioni CRUD
 
-// //INDEX per recuperare lista ordini
-// function index(req, res) {
-//   //definisco query sql
-//   const sql = `SELECT *
-//                  FROM orders`;
-
-//   //eseguo richiesta al DB
-//   connection.query(sql, (err, results) => {
-//     if (err) return res.status(500).json({ error: "database not found" });
-
-//     res.json(results);
-//   });
-// }
-
 // show order 1
 function show(req, res) {
   //recupero parametro id dell'ordine da req
@@ -75,7 +61,7 @@ function store(req, res) {
 
   //QUERY FINALE PER CARICARE I DATI
   const sqlStoreOreders = `INSERT INTO orders(customer_first_name, customer_last_name, customer_city, customer_cap, customer_email, customer_phone, customer_address, order_date, coupon_percentage, total)
-VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?);`;
+VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
 
   //------------------LOGICA PER VERIFICARE COUPON---------------------------
 
