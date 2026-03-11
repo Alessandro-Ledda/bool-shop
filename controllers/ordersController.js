@@ -7,9 +7,13 @@ const connection = require("./../data/db");
 function show(req, res) {
   //recupero parametro id dell'ordine da req
   const order_id = req.params.order_id;
-  const sqlCheckForm = `SELECT *
-                 FROM orders WHERE id = ?`;
 
+  //definisco query sql per recuperare i dati dello'ordine
+  const sqlCheckForm = `SELECT *
+                        FROM orders 
+                        WHERE id = ?`;
+
+  //definisco query sql per recuperare i prodotti dell'ordine
   const sqlCheckProducts = `SELECT product_id,name,price,discount_percentage,unit_price,unit_quantity,image,order_id
                             FROM order_product
                             JOIN products ON order_product.product_id = products.id
@@ -43,9 +47,9 @@ function show(req, res) {
   });
 }
 
-//update per andare a caricare nell'ordine 1 i dati ricevuti dal from del frontend
+//rotta STORE per andare a salvare un nuovo ordine con i dati ricevuti dal from e i prodotti salavati nel carrello front-end
 function store(req, res) {
-  //recupero body da req
+  //recupero tutti i dati inseriti dall'utente nel form
   const {
     customer_first_name,
     customer_last_name,
@@ -59,7 +63,7 @@ function store(req, res) {
 
   //definisco query da fare al db
 
-  //QUERY FINALE PER CARICARE I DATI
+  //QUERY PER CARICARE I DATI
   const sqlStoreOreders = `INSERT INTO orders(customer_first_name, customer_last_name, customer_city, customer_cap, customer_email, customer_phone, customer_address, order_date, coupon_percentage, total)
 VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
 
@@ -119,7 +123,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
       }
     }
 
-    //eseguo query finale per andare a caricare i dati nell'ordine
+    //eseguo query per andare a caricare i dati nell'ordine con totale nullo perchè ancora non inseriti i prodotti
     connection.query(
       sqlStoreOreders,
       [
@@ -134,12 +138,14 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
       ],
       (err, results) => {
         if (err) return res.status(500).json({ error: err });
-        //recupero id appena creato
-        const new_id = results.insertId;
 
+        //recupero id del nuovo ordine appena creato
+        const new_id = results.insertId;
+        //-----------------------LOGICA PER ANDARE A INSERIRE I PRODOTTI-------------------------------
         //STORE per inserire un nuovo prodotto nell'ordine
-        //prendo i dati in ingresso
+        //prendo l'array dei prodotti in ingresso
         const { products } = req.body;
+        //eseguo un ciclo sull'array dei prodotti per andare a salvare uno alla volta i prodotti nel DB realitvi all'ordine appena creato
         products.forEach((product, index) => {
           //-----------------RECUPERO DA DB PREZZO E SCONTO DEL PRODOTTO------------------------
           const sqlProduct = `SELECT price, discount_percentage
@@ -162,21 +168,19 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
               (unit_price =
                 product_price - product_price * (discount_percentage / 100));
 
-            //definisco sql per andare a crearmi la nuova riga nell'ordine 1 con il nuovo prodotto
-            const sql = `INSERT INTO order_product (product_id, order_id, unit_quantity, unit_price)
+            //definisco sql per andare a crearmi la nuova riga nell'ordine con il nuovo prodotto
+            const sqlAddProduct = `INSERT INTO order_product (product_id, order_id, unit_quantity, unit_price)
                 VALUES (?, ?, ?, ?)`;
 
-            //eseguo richiesta al DB
+            //eseguo richiesta al DB per andare ad aggiungere il prodotto
             connection.query(
-              sql,
+              sqlAddProduct,
               [product.product_id, new_id, product.unit_quantity, unit_price],
               (err, results) => {
                 if (err)
                   return res.status(500).json({ error: "database not found" });
 
-                console.log(index);
-                console.log(products.length - 1);
-
+                //quando viene inserito l'ultimo prodotto dell'ordine allora vado a calcolarmi il totale
                 if (index === products.length - 1) {
                   //-------------------------LOGICA PER ESTRAPOLARE TOTALE---------------------------
                   //definisco query sql per ottenere la somma dell'ordine ricercato
@@ -200,7 +204,8 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
                         total_sum -
                         total_sum * (coupon.coupon_percentage / 100));
 
-                    //LOGICA PER AGGIUNGERE TOTALE ALL'ORDINE
+                    //----------------------------LOGICA PER AGGIUNGERE TOTALE ALL'ORDINE----------------------------------------------------
+                    //definisco sql per aggiungere il totale dell'ordine all'ordine in questione
                     const sqlAddTotal = `UPDATE orders
                                              SET total = ?
                                              WHERE id = ?`;
@@ -211,7 +216,8 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
                       [total_order, new_id],
                       (err, results) => {
                         if (err) return res.status(500).json({ error: err });
-
+                        //ora che ho aggiunto tutti i dati nell'ordine posso forzare lo stato della chiamata e rispondere con un oggetto
+                        //con le informazioni che servono per elaborare i dati nel FE
                         res.status(201).json({
                           new_id: new_id,
                           coupon_valid: coupon.valid,
