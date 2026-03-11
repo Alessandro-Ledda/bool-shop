@@ -56,7 +56,7 @@ function show(req, res) {
 }
 
 //update per andare a caricare nell'ordine 1 i dati ricevuti dal from del frontend
-function update(req, res) {
+function store(req, res) {
   //recupero body da req
   const {
     customer_first_name,
@@ -72,19 +72,8 @@ function update(req, res) {
   //definisco query da fare al db
 
   //QUERY FINALE PER CARICARE I DATI
-  const sqlUpdateOreders = `UPDATE orders
-              SET 
-              customer_first_name = ?,
-               customer_last_name = ?, 
-               customer_city = ?, 
-               customer_cap = ?, 
-               customer_email = ?, 
-               customer_phone = ?,
-               customer_address = ?, 
-               order_date = NOW(), 
-               coupon_percentage = ?, 
-               total = ?
-              WHERE id = 1`;
+  const sqlStoreOreders = `INSERT INTO orders(customer_first_name, customer_last_name, customer_city, customer_cap, customer_email, customer_phone, customer_address, order_date, coupon_percentage, total)
+VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?);`;
 
   //------------------LOGICA PER VERIFICARE COUPON---------------------------
 
@@ -165,7 +154,7 @@ function update(req, res) {
 
       //eseguo query finale per andare a caricare i dati nell'ordine
       connection.query(
-        sqlUpdateOreders,
+        sqlStoreOreders,
         [
           customer_first_name,
           customer_last_name,
@@ -193,4 +182,4 @@ function update(req, res) {
   });
 }
 
-module.exports = { show, update };
+module.exports = { show, store };
