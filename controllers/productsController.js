@@ -1,4 +1,5 @@
 //importo connsessione DB
+const { post } = require("../routers/order_productRouter");
 const connection = require("./../data/db");
 
 //-------definisco funzioni CRUD--------
@@ -7,6 +8,9 @@ const connection = require("./../data/db");
 function index(req, res) {
   //recuper valore chiave order per vedere ordinamento
   const order = req.query.order;
+  const discount = req.query.discount;
+  //recuperiamo il valore per la chiave tag fornitaci nella query string normalizzata
+  const searched = req.query.searched.toLowerCase();
 
   //dichiaro variabile che andrà a costituirmi la query di ordinamento nella richiesta DB
   let orderBy = "RAND()";
@@ -18,17 +22,36 @@ function index(req, res) {
   order === "first_arrivals" && (orderBy = "created_date");
   order === "name" && (orderBy = "name");
 
+  //definisco ifDiscount
+  //verifico se definita nell'endpoint la key discount per andare a recuperare dal DB solo prodotti in discount
+  let ifDiscount = "";
+  if (discount)
+    discount === "true" && (ifDiscount = "WHERE discount_percentage");
+
   //definisco query sql
   const sql = `SELECT *
                  FROM products
+                 ${ifDiscount}
                  ORDER BY ${orderBy}`;
 
   //eseguo richiesta al DB
   connection.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: "database not found" });
 
+    let filteredSearched = results;
+    //se esiste un valore di query fornito allora applico il filtro
+    if (searched) {
+      //verifico se il tag arrivato è presente nell'array tags dell'oggetto posts e mi faccio tornare i post che soddisfano questa condizione
+      filteredSearched = results.filter((result) => {
+        //normalizzo i valori da confrontare
+
+        const normalName = result.name.toLowerCase();
+        return normalName.includes(searched);
+      });
+    }
+
     res.json(
-      results.map((product) => {
+      filteredSearched.map((product) => {
         return {
           ...product,
           image_url: `${process.env.APP_URL}/${product.image}`,
