@@ -5,7 +5,7 @@ const port = process.env.PORT;
 // importiamo middleware cors
 const cors = require("cors");
 
-// import del router dei prodotti
+// import dei router
 const productsRouter = require("./routers/productsRouter.js");
 const ordersRouter = require("./routers/ordersRouter.js");
 const order_productRouter = require("./routers/order_productRouter.js");
@@ -34,10 +34,10 @@ app.get("/api", (req, res) => {
   res.send("<h1>Hello World!</h1>");
 });
 
-// rotte relative al router dei prodotti
-app.use("/api/products", productsRouter);
-app.use("/api/orders", ordersRouter);
-app.use("/api/order_product", order_productRouter);
+// rotte principali del back-end
+app.use("/api/products", productsRouter); //gestione prodotti
+app.use("/api/orders", ordersRouter); // gestione ordini
+app.use("/api/order_product", order_productRouter); //gestione relazione ordine-prodotto
 
 // registriamo middelware di gestione rotta inesistente
 app.use(notFound);
