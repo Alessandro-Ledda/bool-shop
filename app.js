@@ -9,6 +9,7 @@ const cors = require("cors");
 const productsRouter = require("./routers/productsRouter.js");
 const ordersRouter = require("./routers/ordersRouter.js");
 const order_productRouter = require("./routers/order_productRouter.js");
+const emailRouter = require("./routers/emailRouter.js");
 
 // import del middelware di gestione errore interno 500
 const errorsHandler = require("./middlewares/errorsHandler.js");
@@ -38,6 +39,9 @@ app.get("/api", (req, res) => {
 app.use("/api/products", productsRouter); //gestione prodotti
 app.use("/api/orders", ordersRouter); // gestione ordini
 app.use("/api/order_product", order_productRouter); //gestione relazione ordine-prodotto
+
+//gestione rotta email
+app.use("/api/email", emailRouter);
 
 // registriamo middelware di gestione rotta inesistente
 app.use(notFound);
