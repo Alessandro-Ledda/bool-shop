@@ -137,34 +137,95 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
         //recupero id appena creato
         const new_id = results.insertId;
 
-        //-------------------------LOGICA PER ESTRAPOLARE TOTALE---------------------------
-        //definisco query sql per ottenere la somma dell'ordine ricercato
-        const sqlTotal = `SELECT SUM(unit_quantity* unit_price) AS total_sum
+        //STORE per inserire un nuovo prodotto nell'ordine
+        //prendo i dati in ingresso
+        const { products } = req.body;
+        products.forEach((product, index) => {
+          //-----------------RECUPERO DA DB PREZZO E SCONTO DEL PRODOTTO------------------------
+          const sqlProduct = `SELECT price, discount_percentage
+                      FROM products
+                      WHERE id = ?`;
+
+          //eseguo query al DB
+          connection.query(sqlProduct, [product.product_id], (err, results) => {
+            //definisco product price come intero per utlizzarlo nelle operazioni di verifica
+            const product_price = parseInt(results[0].price);
+            const discount_percentage = parseInt(
+              results[0].discount_percentage,
+            );
+
+            //definisco il prezzo finale per il singolo prodotto
+            let unit_price = product_price;
+
+            //se esiste il valore discount percentage, e quindi il prodotto è in promozione allora definisco il totate scontato
+            discount_percentage &&
+              (unit_price =
+                product_price - product_price * (discount_percentage / 100));
+
+            //definisco sql per andare a crearmi la nuova riga nell'ordine 1 con il nuovo prodotto
+            const sql = `INSERT INTO order_product (product_id, order_id, unit_quantity, unit_price)
+                VALUES (?, ?, ?, ?)`;
+
+            //eseguo richiesta al DB
+            connection.query(
+              sql,
+              [product.product_id, new_id, product.unit_quantity, unit_price],
+              (err, results) => {
+                if (err)
+                  return res.status(500).json({ error: "database not found" });
+
+                console.log(index);
+                console.log(products.length - 1);
+
+                if (index === products.length - 1) {
+                  //-------------------------LOGICA PER ESTRAPOLARE TOTALE---------------------------
+                  //definisco query sql per ottenere la somma dell'ordine ricercato
+                  const sqlTotal = `SELECT SUM(unit_quantity* unit_price) AS total_sum
                     FROM order_product
                     WHERE order_id = ?`;
 
-        //eseguo query al DB per ottenere la somma relativo all'ordine
-        connection.query(sqlTotal, [new_id], (err, results) => {
-          if (err) return res.status(500).json({ error: err });
+                  //eseguo query al DB per ottenere la somma relativo all'ordine
+                  connection.query(sqlTotal, [new_id], (err, results) => {
+                    if (err) return res.status(500).json({ error: err });
 
-          //recupero questo valore di somma da risposta DB
-          const total_sum = parseInt(results[0].total_sum);
+                    //recupero questo valore di somma da risposta DB
+                    const total_sum = parseInt(results[0].total_sum);
 
-          //creo variabile totale da andare a caricare come ordine totale, inizializzo come totale somma dei prodotti ricavata dal DB
-          let total_order = total_sum;
+                    //creo variabile totale da andare a caricare come ordine totale, inizializzo come totale somma dei prodotti ricavata dal DB
+                    let total_order = total_sum;
 
-          //se esiste il valore coupon percentage, e quindi precedentemente è stato inserito un coupon valido allora definisco il totate scontato
-          coupon.coupon_percentage &&
-            (total_order =
-              total_sum - total_sum * (coupon.coupon_percentage / 100));
+                    //se esiste il valore coupon percentage, e quindi precedentemente è stato inserito un coupon valido allora definisco il totate scontato
+                    coupon.coupon_percentage &&
+                      (total_order =
+                        total_sum -
+                        total_sum * (coupon.coupon_percentage / 100));
 
-          res.json({
-            new_id: new_id,
-            coupon_valid: coupon.valid,
-            message_coupon: coupon.message,
-            discount_coupon: coupon.coupon_percentage,
-            total_order: Number(total_sum.toFixed(2)),
-            total_order_discount: Number(total_order.toFixed(2)),
+                    //LOGICA PER AGGIUNGERE TOTALE ALL'ORDINE
+                    const sqlAddTotal = `UPDATE orders
+                                             SET total = ?
+                                             WHERE id = ?`;
+
+                    //eseguo query al DB per ottenere la somma relativo all'ordine
+                    connection.query(
+                      sqlAddTotal,
+                      [total_order, new_id],
+                      (err, results) => {
+                        if (err) return res.status(500).json({ error: err });
+
+                        res.status(201).json({
+                          new_id: new_id,
+                          coupon_valid: coupon.valid,
+                          message_coupon: coupon.message,
+                          discount_coupon: coupon.coupon_percentage,
+                          total_order: Number(total_sum.toFixed(2)),
+                          total_order_discount: Number(total_order.toFixed(2)),
+                        });
+                      },
+                    );
+                  });
+                }
+              },
+            );
           });
         });
       },
