@@ -51,7 +51,7 @@ function store(req, res) {
 
       res.json({ message: "Inviate entrambe email con successo" });
     });
-  }, 10000);
+  }, 15000);
 }
 
 module.exports = { store };

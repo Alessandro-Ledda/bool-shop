@@ -155,7 +155,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
           //eseguo query al DB
           connection.query(sqlProduct, [product.product_id], (err, results) => {
             //definisco product price come intero per utlizzarlo nelle operazioni di verifica
-            const product_price = parseInt(results[0].price);
+            const product_price = parseFloat(results[0].price);
             const discount_percentage = parseInt(
               results[0].discount_percentage,
             );
