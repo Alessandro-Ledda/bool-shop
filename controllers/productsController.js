@@ -1,5 +1,4 @@
 //importo connsessione DB
-const { post } = require("../routers/order_productRouter");
 const connection = require("./../data/db");
 
 //-------definisco funzioni CRUD--------
