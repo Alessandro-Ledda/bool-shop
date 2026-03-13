@@ -1,6 +1,9 @@
 //importo connsessione DB
 const connection = require("./../data/db");
 
+//importo validator per email
+const validator = require("validator");
+
 //definisco funzioni CRUD
 
 // show order 1
@@ -66,31 +69,35 @@ function store(req, res) {
   // //validazione input
 
   if (req.body.customer_first_name === "" || !req.body.customer_first_name) {
-    return res.status(400).json({ error: `Inserire Nome` });
+    return res.status(404).json({ error: `Inserire Nome` });
   }
 
-  if (req.body.customer_last_name === "" || !req.body.customer_first_name) {
-    return res.status(400).json({ error: `Inserire Cognome` });
+  if (req.body.customer_last_name === "" || !req.body.customer_last_name) {
+    return res.status(404).json({ error: `Inserire Cognome` });
   }
 
-  if (req.body.customer_city === "" || !req.body.customer_first_name) {
-    return res.status(400).json({ error: `Inserire Città` });
+  if (req.body.customer_city === "" || !req.body.customer_city) {
+    return res.status(404).json({ error: `Inserire Città` });
   }
 
-  if (req.body.customer_cap === "" || !req.body.customer_first_name) {
-    return res.status(400).json({ error: `Inserire CAP` });
+  if (req.body.customer_cap === "" || !req.body.customer_cap) {
+    return res.status(404).json({ error: `Inserire CAP` });
   }
 
-  if (req.body.customer_email === "" || !req.body.customer_first_name) {
-    return res.status(400).json({ error: `Inserire Email` });
+  if (req.body.customer_email === "" || !req.body.customer_email) {
+    return res.status(404).json({ error: `Inserire Email` });
+  } else if (!validator.isEmail(req.body.customer_email)) {
+    return res.status(404).json({ error: "Email non valida" });
   }
 
-  if (req.body.customer_phone === "" || !req.body.customer_first_name) {
-    return res.status(400).json({ error: `Inserire Telefono` });
+  if (req.body.customer_phone === "" || !req.body.customer_phone) {
+    return res.status(404).json({ error: `Inserire Telefono` });
+  } else if (!validator.isMobilePhone(req.body.customer_phone, "any")) {
+    return res.status(404).json({ error: "Numero di telefono non valido" });
   }
 
-  if (req.body.customer_address === "" || !req.body.customer_first_name) {
-    return res.status(400).json({ error: `Inserire Indirizzo` });
+  if (req.body.customer_address === "" || !req.body.customer_address) {
+    return res.status(404).json({ error: `Inserire Indirizzo` });
   }
 
   //definisco query da fare al db
