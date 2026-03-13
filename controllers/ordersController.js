@@ -102,7 +102,7 @@ function store(req, res) {
 
   //QUERY PER CARICARE I DATI
   const sqlStoreOreders = `INSERT INTO orders(customer_first_name, customer_last_name, customer_city, customer_cap, customer_email, customer_phone, customer_address, order_date, coupon_percentage, total)
-VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
+                           VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
 
   //------------------LOGICA PER VERIFICARE COUPON---------------------------
 
@@ -182,7 +182,8 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
         //STORE per inserire un nuovo prodotto nell'ordine
         //prendo l'array dei prodotti in ingresso
         const { products } = req.body;
-
+        //variabile di verifica quantità
+        let verify_quantity = true;
         //eseguo un ciclo sull'array dei prodotti per andare a salvare uno alla volta i prodotti nel DB realitvi all'ordine appena creato
         products.forEach((product, index) => {
           //-----------------RECUPERO DA DB PREZZO E SCONTO DEL PRODOTTO------------------------
@@ -193,6 +194,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
           //eseguo query al DB
           connection.query(sqlProduct, [product.product_id], (err, results) => {
             if (product.unit_quantity < 1) {
+              verify_quantity = false;
               return res.status(400).json({
                 error: `Il prodotto ${results[0].name} ha quantità non valida`,
               });
@@ -225,7 +227,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
                   return res.status(500).json({ error: "database not found" });
 
                 //quando viene inserito l'ultimo prodotto dell'ordine allora vado a calcolarmi il totale
-                if (index === products.length - 1) {
+                if (index === products.length - 1 && verify_quantity) {
                   //-------------------------LOGICA PER ESTRAPOLARE TOTALE---------------------------
                   //definisco query sql per ottenere la somma dell'ordine ricercato
                   const sqlTotal = `SELECT SUM(unit_quantity* unit_price) AS total_sum
