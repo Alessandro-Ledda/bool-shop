@@ -61,6 +61,38 @@ function store(req, res) {
     coupon_code,
   } = req.body;
 
+  console.log(req.body);
+
+  // //validazione input
+
+  if (req.body.customer_first_name === "" || !req.body.customer_first_name) {
+    return res.status(400).json({ error: `Inserire Nome` });
+  }
+
+  if (req.body.customer_last_name === "" || !req.body.customer_first_name) {
+    return res.status(400).json({ error: `Inserire Cognome` });
+  }
+
+  if (req.body.customer_city === "" || !req.body.customer_first_name) {
+    return res.status(400).json({ error: `Inserire Città` });
+  }
+
+  if (req.body.customer_cap === "" || !req.body.customer_first_name) {
+    return res.status(400).json({ error: `Inserire CAP` });
+  }
+
+  if (req.body.customer_email === "" || !req.body.customer_first_name) {
+    return res.status(400).json({ error: `Inserire Email` });
+  }
+
+  if (req.body.customer_phone === "" || !req.body.customer_first_name) {
+    return res.status(400).json({ error: `Inserire Telefono` });
+  }
+
+  if (req.body.customer_address === "" || !req.body.customer_first_name) {
+    return res.status(400).json({ error: `Inserire Indirizzo` });
+  }
+
   //definisco query da fare al db
 
   //QUERY PER CARICARE I DATI
