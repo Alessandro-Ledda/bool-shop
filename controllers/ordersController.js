@@ -239,7 +239,7 @@ function store(req, res) {
                     if (err) return res.status(500).json({ error: err });
 
                     //recupero questo valore di somma da risposta DB
-                    const total_sum = parseInt(results[0].total_sum);
+                    const total_sum = parseFloat(results[0].total_sum);
 
                     //creo variabile totale da andare a caricare come ordine totale, inizializzo come totale somma dei prodotti ricavata dal DB
                     let total_order = total_sum;
