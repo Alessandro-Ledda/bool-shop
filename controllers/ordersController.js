@@ -64,40 +64,38 @@ function store(req, res) {
     coupon_code,
   } = req.body;
 
-  console.log(req.body);
-
   // //validazione input
 
   if (req.body.customer_first_name === "" || !req.body.customer_first_name) {
-    return res.status(404).json({ error: `Inserire Nome` });
+    return res.status(400).json({ error: `Inserire Nome` });
   }
 
   if (req.body.customer_last_name === "" || !req.body.customer_last_name) {
-    return res.status(404).json({ error: `Inserire Cognome` });
+    return res.status(400).json({ error: `Inserire Cognome` });
   }
 
   if (req.body.customer_city === "" || !req.body.customer_city) {
-    return res.status(404).json({ error: `Inserire Città` });
+    return res.status(400).json({ error: `Inserire Città` });
   }
 
   if (req.body.customer_cap === "" || !req.body.customer_cap) {
-    return res.status(404).json({ error: `Inserire CAP` });
+    return res.status(400).json({ error: `Inserire CAP` });
   }
 
   if (req.body.customer_email === "" || !req.body.customer_email) {
-    return res.status(404).json({ error: `Inserire Email` });
+    return res.status(400).json({ error: `Inserire Email` });
   } else if (!validator.isEmail(req.body.customer_email)) {
-    return res.status(404).json({ error: "Email non valida" });
+    return res.status(400).json({ error: "Email non valida" });
   }
 
   if (req.body.customer_phone === "" || !req.body.customer_phone) {
-    return res.status(404).json({ error: `Inserire Telefono` });
+    return res.status(400).json({ error: `Inserire Telefono` });
   } else if (!validator.isMobilePhone(req.body.customer_phone, "any")) {
-    return res.status(404).json({ error: "Numero di telefono non valido" });
+    return res.status(400).json({ error: "Numero di telefono non valido" });
   }
 
   if (req.body.customer_address === "" || !req.body.customer_address) {
-    return res.status(404).json({ error: `Inserire Indirizzo` });
+    return res.status(400).json({ error: `Inserire Indirizzo` });
   }
 
   //definisco query da fare al db
@@ -184,15 +182,22 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, 0);`;
         //STORE per inserire un nuovo prodotto nell'ordine
         //prendo l'array dei prodotti in ingresso
         const { products } = req.body;
+
         //eseguo un ciclo sull'array dei prodotti per andare a salvare uno alla volta i prodotti nel DB realitvi all'ordine appena creato
         products.forEach((product, index) => {
           //-----------------RECUPERO DA DB PREZZO E SCONTO DEL PRODOTTO------------------------
-          const sqlProduct = `SELECT price, discount_percentage
+          const sqlProduct = `SELECT name, price, discount_percentage
                       FROM products
                       WHERE id = ?`;
 
           //eseguo query al DB
           connection.query(sqlProduct, [product.product_id], (err, results) => {
+            if (product.unit_quantity < 1) {
+              return res.status(400).json({
+                error: `Il prodotto ${results[0].name} ha quantità non valida`,
+              });
+            }
+
             //definisco product price come intero per utlizzarlo nelle operazioni di verifica
             const product_price = parseFloat(results[0].price);
             const discount_percentage = parseInt(
