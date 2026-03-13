@@ -9,6 +9,7 @@ const cors = require("cors");
 const productsRouter = require("./routers/productsRouter.js");
 const ordersRouter = require("./routers/ordersRouter.js");
 const emailRouter = require("./routers/emailRouter.js");
+const couponsRouter = require("./routers/couponsRouter.js");
 
 // import del middelware di gestione errore interno 500
 const errorsHandler = require("./middlewares/errorsHandler.js");
@@ -37,6 +38,7 @@ app.get("/api", (req, res) => {
 // rotte principali del back-end
 app.use("/api/products", productsRouter); //gestione prodotti
 app.use("/api/orders", ordersRouter); // gestione ordini
+app.use("/api/coupons", couponsRouter);
 
 //gestione rotta email
 app.use("/api/email", emailRouter);
