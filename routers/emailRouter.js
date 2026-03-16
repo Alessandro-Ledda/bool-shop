@@ -6,6 +6,6 @@ const emailController = require("./../controllers/emailController");
 //--------------------DEFINIZIONE ROTTE---------------------
 
 //rotta di index
-emailRouter.post("/", emailController.store);
+emailRouter.get("/:order_id", emailController.store);
 
 module.exports = emailRouter;
