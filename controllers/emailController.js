@@ -3,7 +3,7 @@ const connection = require("./../data/db");
 
 //definisco il trasporter con i dati del servizio che manderà l'email
 const transporter = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
+  host: process.env.EMAIL_HOST,
   port: 587,
   auth: {
     user: process.env.MAILTRAP_USERNAME,
