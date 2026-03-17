@@ -11,7 +11,7 @@ function index(req, res) {
   const discount = req.query.discount;
 
   //dichiaro variabile che andrà a costituirmi la query di ordinamento nella richiesta DB
-  let orderBy = "RAND()";
+  let orderBy = "weight";
 
   //valuto questo valore
   order === "more_price" && (orderBy = "price DESC");
